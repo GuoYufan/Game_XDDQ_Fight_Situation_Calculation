@@ -426,6 +426,7 @@ void 检查精怪(Fight_info * self, Fight_info * opponent, char *精怪名称, 
 		
 		self->雷公层数++;
 		计算本次伤害(self,opponent,"雷公");
+		self->战斗属性之击晕+=5;
 		
 		printf("❗️%s精怪%s触发, 目前%d层, 造成%g%%伤害, 战斗属性之击晕%g%%\n",
 			   self->哪一方, 精怪名称, self->雷公层数, self->本次伤害 * 100, self->战斗属性之击晕);
