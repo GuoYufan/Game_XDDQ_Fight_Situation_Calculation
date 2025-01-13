@@ -39,6 +39,7 @@ void Fight_info_input(Fight_info * self, const char *prompt)
 
 void Fight_info_init(Fight_info * self, char *who)
 {
+	/*
 	当前对手(self,who);
 	if (!strcmp(who,"我"))
 	{
@@ -46,8 +47,9 @@ void Fight_info_init(Fight_info * self, char *who)
 		//鸾鸟流(self,1.11);
 		
 	}
+	*/
 	
-	//当前对手_另一个号反暴的(self,who);
+	// 当前对手_另一个号反暴的(self,who);
 
 	/*if (!strcmp(who,"敌")) 
 	{
@@ -61,7 +63,13 @@ void Fight_info_init(Fight_info * self, char *who)
 		应龙流(self,5);
 	}*/
 	
+	// 当前对手_97亿越战140亿(self,who);
 	
+	 当前对手_回归斗法打1点6倍对手(self,who);
+	
+	// 当前对手_新区炼气之前(self,who);
+
+
 }
 
 
@@ -92,14 +100,18 @@ void 不受影响的计算与显示(Fight_info *, Fight_info *);
 void 检查复活(Fight_info *, Fight_info *);
 void 妖气变化(Fight_info *, float);
 void 治疗溢出修正(Fight_info *);
-void 受伤(Fight_info *, Fight_info *, float);
+void 受伤(Fight_info *, Fight_info *, float );
 void 检查精怪(Fight_info *, Fight_info *, char *, char *);
 void 精怪跟随(Fight_info *, Fight_info *, char *);
 void 检查人物被晕状态是否可恢复(Fight_info *);
+void 战斗属性_setter(Fight_info *, Fight_info *, char *, float );
 void 计算实际击晕率(Fight_info *, Fight_info *);
-int 击晕率是否足够(Fight_info *, Fight_info *);
+void 计算实际暴击率(Fight_info *, Fight_info *);
+bool 击晕率是否足够(Fight_info *, Fight_info *);
+bool 暴击率是否足够(Fight_info *, Fight_info *);
 void 被击晕(Fight_info *);
 void 击晕判定及相关经过(Fight_info *, Fight_info *);
+void 暴击判定及相关经过(Fight_info *, Fight_info *);
 void 灵脉跟随(Fight_info *, char *);
 void 进行识海钉流血(Fight_info *, Fight_info *);
 void 检查神通(Fight_info *, Fight_info *, char *, char *);
@@ -112,8 +124,10 @@ void 计算本次治疗(Fight_info *self, Fight_info *opponent, char *治疗种�
 void 治疗(Fight_info *self);
 void 释放道法(Fight_info *, Fight_info *);
 void 进行普攻(Fight_info *, Fight_info *);
+void 解复活未起身(Fight_info *, Fight_info *);
+void 灵兽效果(Fight_info *, Fight_info *, char *);
 void 轮序到人物(Fight_info *, Fight_info *);
-void 轮序到灵兽(Fight_info *, Fight_info *, int );
+void 轮序到灵兽(Fight_info *, Fight_info *);
 
 
 
@@ -139,7 +153,7 @@ void 统一free(Fight_info *self, Fight_info *opponent)
 	free(opponent->精怪分组);
 	free(opponent->神通分组);
 	
-	free(self->存档->触发计数);
+	free(self->触发计数);
 	free(self->存档);
 	
 	free(self);
@@ -168,7 +182,7 @@ void 载入神通与精怪(Fight_info * self, Fight_info * opponent)
 	
 	if (strstr(self->携带精怪, "破阵书生") != NULL)
 	{
-		self->血 *= 1.12;
+		self->血 *= 1.14;
 	}
 	
 	if (strstr(self->携带神通, "飘渺身" ) != NULL)
@@ -195,6 +209,14 @@ void 载入神通与精怪(Fight_info * self, Fight_info * opponent)
 	{
 		self->战斗抗性之抗晕+=28;
 	}
+	
+	if (strstr(self->携带精怪, "大山妖") != NULL )
+	{
+		opponent->增伤系数-=0.1;
+	}
+	
+	
+	
 }
 
 
@@ -236,7 +258,7 @@ void 不受影响的计算与显示(Fight_info * 先手方, Fight_info * 后手�
 		 后手方->协同灵兽伤*100, 后手方->协同灵兽回血*100);
 	printf("[先手方精怪%s|后手方精怪%s]\n", 先手方->携带精怪, 后手方->携带精怪);
 	printf("[先手方神通%s|后手方神通%s]\n", 先手方->携带神通, 后手方->携带神通);
-
+	printf("[先手方暴击率%g%%+击晕率%g%%|后手方暴击率%g%%+击晕率%g%%]\n", 先手方->暴击率, 先手方->击晕率, 后手方->暴击率, 后手方->击晕率);
 }
 
 
@@ -255,7 +277,7 @@ void 检查复活(Fight_info * self, Fight_info * opponent)
 	{
 		printf("(目前:先手方%g%% VS 后手方%g%%)\n", 后手方->已损生命*100,
 			   先手方->已损生命*100);
-		printf("(目前妖气:先手方%d VS 后手方 %d)\n", 先手方->妖气,
+		printf("(目前妖气:先手方%g VS 后手方 %g)\n", 先手方->妖气,
 			   后手方->妖气);
 			   
 		if (!self->复活未起身 && self->可复活次数<1)
@@ -288,13 +310,17 @@ void 检查复活(Fight_info * self, Fight_info * opponent)
 
 
 
-// 0:普攻
-// -1:刚刚释放完道法，需要清空妖气
-// 大于0:受伤并输入受伤值
+// -1:普攻
+// -2:刚刚释放完道法，需要清空妖气
+// -3:啸月
+// -4:万妖体
+// 大于等于0:受伤并输入受伤值
 // -800:被对手蚀魂咒
 void 妖气变化(Fight_info * self, float 本次掉血多少)
 {
-	if (本次掉血多少==-1)
+	if (!self->神通数量) return;
+	// 刚刚释放完道法，需要清空妖气
+	if (本次掉血多少==-2)
 	{
 		self->妖气=0;
 		self->已完成补气=0;
@@ -305,12 +331,12 @@ void 妖气变化(Fight_info * self, float 本次掉血多少)
 		return;
 	}
 
-	if (本次掉血多少>0)
+	if (本次掉血多少>=0)
 	{
 		// 掉血补气
 		self->妖气+=本次掉血多少*5000;
 	}
-	else if (本次掉血多少==0)
+	else if (本次掉血多少==-1)
 	{
 		// 普攻补气
 		self->妖气+=2000;
@@ -320,8 +346,18 @@ void 妖气变化(Fight_info * self, float 本次掉血多少)
 		// 被蚀魂咒减气
 		self->妖气-=800;
 	}
+	else if (本次掉血多少==-3)
+	{
+		// 啸月
+		self->妖气+=2240;
+	}
+	else if (本次掉血多少==-4)
+	{
+		// 万妖体
+		self->妖气+=800;
+	}
+	
 
-		
 	if (self->妖气>10000)
 		self->妖气=10000;	
 	else if (self->妖气<0)
@@ -347,7 +383,7 @@ void 治疗溢出修正(Fight_info * self)
 }
 
 
-void 受伤(Fight_info * self, Fight_info * opponent, float 本次掉血多少)
+void 受伤(Fight_info * self, Fight_info * opponent, float 本次掉血多少 )
 {
 	if (strstr(self->携带神通, "飘渺身")!=NULL && self->飘渺身剩余回合数>0)
 	{
@@ -362,6 +398,7 @@ void 受伤(Fight_info * self, Fight_info * opponent, float 本次掉血多少)
 	}
 	
 	self->已损生命+=本次掉血多少;
+	//治疗溢出修正(self);
 	妖气变化(self, 被妖气计算的掉血量);
 	检查复活(self, opponent);
 	if (!self->复活未起身)
@@ -411,7 +448,7 @@ void 检查精怪(Fight_info * self, Fight_info * opponent, char *精怪名称, 
 		self->强灵系数+=0.07;
 		self->大树妖层数++;
 		printf("❗️%s精怪%s触发, 目前%d层",
-		 self->哪一方, 精怪名称, self->大树妖层数, self->强灵系数);
+		 self->哪一方, 精怪名称, self->大树妖层数 );
 		 
 		if (self->大树妖层数==5) printf("(现已满层)");
 		printf(", 强灵系数%g",self->强灵系数);
@@ -456,6 +493,24 @@ void 检查精怪(Fight_info * self, Fight_info * opponent, char *精怪名称, 
 		self->皇帝已触发=1;
 		return;
 	}
+	
+	if (!strcmp(精怪名称, "大明王") && !strcmp(时刻, "普攻后"))
+	{
+		// static也是可行的。static也是一种存档作用。它只初始化一次。
+		// static short 大明王已触发几次=0;
+		
+		if (self->精怪图鉴->大明王_层数>=self->精怪图鉴->大明王_满层) return;
+		
+		战斗属性_setter(self, opponent, "暴击", self->战斗属性之暴击+8);
+		self->精怪图鉴->大明王_层数++;
+		printf("❗️%s精怪%s触发, 目前%d次",
+		 self->哪一方, 精怪名称, self->精怪图鉴->大明王_层数 );
+		 
+		if (self->精怪图鉴->大明王_层数==self->精怪图鉴->大明王_满层) printf("(现已满)");
+		printf(", 暴击率%g%%",self->暴击率);
+		putchar(10);
+	}
+
 }
 
 
@@ -517,23 +572,74 @@ void 计算实际击晕率(Fight_info *self, Fight_info *opponent)
 	}
 }
 
+void 战斗属性_setter(Fight_info *self,Fight_info *opponent, char *名称, float value)
+{
+	if (!strcmp(名称, "暴击"))
+	{
+		self->战斗属性之暴击=value;
+		计算实际暴击率(self,opponent);
+	}
+	else if (!strcmp(名称, "击晕"))
+	{
+		self->战斗属性之击晕=value;
+		计算实际击晕率(self,opponent);
+	}
+}
 
-int 击晕率是否足够(Fight_info * self, Fight_info * opponent)
+void 计算实际暴击率(Fight_info *self, Fight_info *opponent)
+{
+	self->暴击率 = self->战斗属性之暴击-opponent->战斗抗性之抗暴;	
+	
+	if (self->暴击率<0)
+	{
+		self->暴击率 = 0;
+		return;
+	}
+	
+	if (self->暴击率>100)
+	{
+		self->暴击率 = 100;
+		return;
+	}
+}
+
+
+
+
+bool 击晕率是否足够(Fight_info * self, Fight_info * opponent)
 {
 	计算实际击晕率(self,opponent);
 	
 	if (self->除了设置漏晕以外的皆必晕 && self->漏晕几次==0)
 	{
-		return 1;
+		return true;
 	}
 	
-	int 随机数=0;
+	short 随机数=0;
 	
 	随机数=rand() % 100 + 1;
 	printf("随机数%d",随机数);
 	
 	return in_interval(随机数, 1, self->击晕率);
 }
+
+
+bool 暴击率是否足够(Fight_info * self, Fight_info * opponent)
+{
+	计算实际暴击率(self,opponent);
+	
+	short 随机数=0;
+	
+	随机数=rand() % 100 + 1;
+	
+	if (in_interval(随机数, 1, self->暴击率))
+	{
+		printf("随机数%d",随机数);
+		return true;		
+	}
+	else return false;
+}
+
 
 
 void 被击晕(Fight_info * self)
@@ -566,6 +672,25 @@ void 击晕判定及相关经过(Fight_info *self, Fight_info *opponent)
 		 self->战斗属性之击晕-opponent->战斗抗性之抗晕, self->击晕率);
 	}
 }
+
+
+void 暴击判定及相关经过(Fight_info *self, Fight_info *opponent)
+{
+	if (暴击率是否足够(self, opponent))
+	{
+		printf("⏰%s人物成功暴击%s人物, ", self->哪一方, opponent->哪一方);
+		self->触发了暴击=true;
+		printf("此前面板暴击率%g%%, 实际暴击率%g%%, ",
+		 self->战斗属性之暴击-opponent->战斗抗性之抗暴, self->暴击率);
+		printf("暴伤系数%g\n",self->暴伤系数);
+	}
+	else 
+	{
+		//printf("❌%s人物暴击失败, ", self->哪一方);
+		self->触发了暴击=false;
+	}
+}
+
 
 
 void 灵脉跟随(Fight_info *self, char *时刻)
@@ -662,10 +787,10 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 	{	
 		if (opponent->复活未起身) return;
 		
-		float 本次偷取攻击力 = opponent->攻 * 0.024;
-		if (本次偷取攻击力 > self->攻 * 0.17)
+		float 本次偷取攻击力 = opponent->攻 * 0.023;
+		if (本次偷取攻击力 > self->攻 * 0.165)
 		{
-			本次偷取攻击力 = self->攻 * 0.17;
+			本次偷取攻击力 = self->攻 * 0.165;
 		}
 		 
 		self->攻+=本次偷取攻击力;
@@ -691,7 +816,7 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 	
 	if (!strcmp(神通名称, "回春") && !strcmp(时刻, "灵兽释放技能时"))
 	{
-		if (self->存档->触发计数->回春 !=0) return;
+		if (self->触发计数->回春 !=0) return;
 		
 		if (self->复活未起身) return;
 		
@@ -700,7 +825,7 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 		printf("❗%s灵兽释放技能时触发驭兽神通%s, 治疗了%g%%生命\n",
 		 self->哪一方, 神通名称, self->本次治疗 * 100);
 		治疗(self);
-		self->存档->触发计数->回春++;
+		self->触发计数->回春++;
 		return;
 	}
 	
@@ -721,19 +846,20 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 		if (!strcmp(时刻, "受击"))
 		{
 			if (self->复活未起身) return;
-			if (self->存档->触发计数->兽灵体<10)
+			if (self->触发计数->兽灵体<10)
 			{
 				self->强灵系数+=0.03;
-				self->存档->触发计数->兽灵体++;
+				self->触发计数->兽灵体++;
 				printf("❗%s人物被动神通%s触发, 目前%d层, 强灵系数%g\n",
-				self->哪一方, 神通名称, self->存档->触发计数->兽灵体, self->强灵系数);
+				self->哪一方, 神通名称, self->触发计数->兽灵体, self->强灵系数);
 				return;
 			}
 		}
 		else if (!strcmp(时刻, "灵兽释放技能时"))
 		{
-			self->强灵系数-= 0.03 * self->存档->触发计数->兽灵体;
-			self->存档->触发计数->兽灵体=0;
+			self->强灵系数-= 0.03 * self->触发计数->兽灵体;
+			self->触发计数->兽灵体=0;
+			return;
 		}
 	}
 	
@@ -752,27 +878,27 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 	if (!strcmp(神通名称, "大魔邪身") && !strcmp(时刻, "受击") )
 	{
 		if (self->复活未起身) return;
-		if (self->存档->触发计数->大魔邪身<5)
+		if (self->触发计数->大魔邪身<5)
 		{
 			self->攻*=1.029;
-			self->存档->触发计数->大魔邪身++;
+			self->触发计数->大魔邪身++;
 			printf("❗%s人物被动神通%s触发, 目前%d层%s, 攻击力%g\n",
-			 self->哪一方, 神通名称, self->存档->触发计数->大魔邪身,
-			 self->存档->触发计数->大魔邪身<5?"":"(已满层)",
+			 self->哪一方, 神通名称, self->触发计数->大魔邪身,
+			 self->触发计数->大魔邪身<5?"":"(已满层)",
 			 self->攻);
 			return;
 		}
 	}
 	
-	if (!strcmp(神通名称, "蚀魂咒") && !strcmp(时刻, "普攻前"))
+	if (!strcmp(神通名称, "蚀魂咒") && !strcmp(时刻, "普攻后"))
 	{
-		if (opponent->复活未起身) return;
+		// if (opponent->复活未起身) return;
 		
-		printf("❗️%s人物神识神通%s触发, %s人物此前妖气%d",
+		printf("❗️%s人物神识神通%s触发, %s人物此前妖气%g",
 		 self->哪一方, 神通名称, opponent->哪一方, opponent->妖气);
 		
 		妖气变化(opponent,-800);
-		printf(", 目前妖气%d\n",opponent->妖气);
+		printf(", 目前妖气%g\n",opponent->妖气);
 		
 		return;
 	}
@@ -791,6 +917,46 @@ void 检查神通(Fight_info * self, Fight_info * opponent, char *神通名称, 
 		受伤(self,opponent,本次吞灵掉血_自己);
 		受伤(opponent, self, 本次吞灵掉血_对方);
 		return;
+	}
+	
+	if (!strcmp(神通名称, "啸月") && !strcmp(时刻, "灵兽释放技能时"))
+	{
+		if (self->复活未起身) return;
+		
+		妖气变化(self,-3);
+		return;
+	}
+	
+	if (!strcmp(神通名称, "万妖体") && !strcmp(时刻, "回合开始时"))
+	{
+		妖气变化(self,-4);
+		return;
+	}
+	
+	if (!strcmp(神通名称, "煌气") && self->第几回合>=4 )
+	{
+		if (!strcmp(时刻, "灵兽释放技能时"))
+		{
+			if (self->触发计数->煌气 !=0) return;
+			
+			if (self->复活未起身) return;
+			
+			计算本次治疗(self,opponent,"煌气");
+			
+			printf("❗%s灵兽释放技能时触发驭兽神通%s, 治疗了%g%%生命, 并且免疫冰冻燃烧4回合\n",
+			 self->哪一方, 神通名称, self->本次治疗 * 100);
+			治疗(self);
+			
+			self->免疫冰冻燃烧回合数=4;
+			
+			self->触发计数->煌气++;
+			return;
+		}
+		else if (!strcmp(时刻, "回合结束时") && self->免疫冰冻燃烧回合数>0)
+		{
+			self->免疫冰冻燃烧回合数--;
+			return;
+		}
 	}
 }
 
@@ -844,8 +1010,10 @@ void 重新计算全部伤害(Fight_info *self, Fight_info *opponent)
 	opponent->协同灵兽回血=opponent->攻*opponent->
 		协同灵兽回血倍率_乘在攻/opponent->血;
 
-	self->主灵兽伤 = self->攻 * self->主灵兽伤倍率_乘在攻 / opponent->血;
-	
+	计算实际暴击率(self,opponent);
+	计算实际暴击率(opponent,self);
+	计算实际击晕率(self,opponent);
+	计算实际击晕率(opponent,self);
 }
 
 // 使用原式，非奇技淫巧
@@ -857,15 +1025,32 @@ float 重新计算指定伤害(Fight_info *self, Fight_info *opponent, char *伤
 		return self->主灵兽伤;
 	}
 	
+	if (!strcmp(伤害种类, "协同灵兽伤"))
+	{
+		self->协同灵兽伤 = self->攻 * self->协同灵兽伤倍率_乘在攻 / opponent->血 * self->强灵系数 * self->增伤系数;
+		return self->协同灵兽伤;
+	}
+	
 	if (!strcmp(伤害种类, "有视防御伤"))
 	{
 		self->有视防御伤 = (self->攻 - opponent->防) / opponent->血 * self->增伤系数;
+		if (self->触发了暴击)
+		{
+			self->有视防御伤*=self->暴伤系数;
+			self->暴伤系数+=(7+5*self->青龙灵脉层数)/100.0;
+			self->触发了暴击=false;
+		}
 		return self->有视防御伤;
 	}
 	
 	if (!strcmp(伤害种类, "道法伤"))
 	{
 		self->道法伤 = (self->攻 * self->道法伤倍率_乘在攻 - self->防) / opponent->血 * self->增伤系数;
+		if (self->触发了暴击)
+		{
+			self->道法伤*=self->暴伤系数;
+			self->触发了暴击=false;
+		}
 		return self->道法伤;
 	}
 	
@@ -889,7 +1074,7 @@ float 重新计算指定伤害(Fight_info *self, Fight_info *opponent, char *伤
 	
 	if (!strcmp(伤害种类, "皇帝伤"))
 	{
-		return self->攻 * 1.3 / opponent->血 * self->增伤系数;
+		return self->攻 * self->精怪图鉴->皇帝_攻倍 / opponent->血 * self->增伤系数;
 	}
 	
 	if (!strcmp(伤害种类, "暗袭"))
@@ -908,7 +1093,7 @@ float 重新计算指定伤害(Fight_info *self, Fight_info *opponent, char *伤
 // 统一管理所有伤害
 void 计算本次伤害(Fight_info *self, Fight_info *opponent, char *伤害种类)
 {
-	self->本次伤害 = 重新计算指定伤害(self,opponent,伤害种类);	
+	self->本次伤害 = 重新计算指定伤害(self,opponent,伤害种类);
 	if (opponent->飘渺身剩余回合数>0)
 	{
 		self->本次伤害*=(1-0.2);
@@ -946,6 +1131,19 @@ void 计算本次伤害(Fight_info *self, Fight_info *opponent, char *伤害种�
 			self->本次伤害 += self->自行设置额外伤;
 			self->额外伤限定回合数--;
 		}
+		
+		if (opponent->百分百闪避)
+		{
+			if (strstr(伤害种类,"道法")==NULL)
+			{
+				self->本次伤害=0;
+				if (opponent->触发计数->勾陈灵脉<5)
+				{
+					opponent->强灵系数 += 0.04 + 0.02*(opponent->勾陈灵脉层数-1);
+					opponent->触发计数->勾陈灵脉++;
+				}
+			}
+		}
 	}
 	
 	
@@ -969,6 +1167,12 @@ float 重新计算指定治疗(Fight_info *self, Fight_info *opponent, char *治
 		return self->主灵兽回血;
 	}
 	
+	if (!strcmp(治疗种类, "协同灵兽回血"))
+	{
+		self->协同灵兽回血 = self->攻 * self->协同灵兽回血倍率_乘在攻 / self->血 * self->强灵系数;
+		return self->协同灵兽回血;
+	}
+	
 	if (!strcmp(治疗种类, "回春"))
 	{
 		return self->已损生命 * 0.22;
@@ -979,6 +1183,12 @@ float 重新计算指定治疗(Fight_info *self, Fight_info *opponent, char *治
 		return self->已损生命 * 0.057;
 		
 	}
+	
+	if (!strcmp(治疗种类, "煌气"))
+	{
+		return 0.14;
+	}
+	
 }
 
 
@@ -998,8 +1208,10 @@ void 释放道法(Fight_info *self, Fight_info *opponent)
 	if (self->道法伤倍率_乘在攻 != 0)
 	{
 		计算本次伤害(self, opponent, "道法伤");
+		// 道法暴击
+		//if (strstr(self->哪一方,"先")) self->本次伤害*=2;	
 		printf("%s人物道法神通%s攻击力伤%g%%\n", self->哪一方, self->道法名称, self->本次伤害 * 100);
-		受伤(opponent, self, self->本次伤害);
+		受伤(opponent, self, self->本次伤害 );
 	}
 	
 	if (self->道法回血倍率_乘在攻 != 0)
@@ -1019,11 +1231,11 @@ void 释放道法(Fight_info *self, Fight_info *opponent)
 	}
 	
 	
-	妖气变化(self, -1);
+	妖气变化(self, -2);
 	
 	if (!strcmp(self->道法名称, "冰封千里"))
 	{
-		if (!opponent->被冰冻的需要失去几次行动)
+		if (!opponent->免疫冰冻燃烧回合数 && !opponent->被冰冻的需要失去几次行动)
 		{
 			opponent->被冰冻的需要失去几次行动++;
 			opponent->处于冰冻状态=true;
@@ -1037,8 +1249,8 @@ void 进行普攻(Fight_info *self, Fight_info *opponent)
 {
 	计算本次伤害(self, opponent, "有视防御伤");
 	printf("%s人物普攻%g%%\n", self->哪一方, self->本次伤害 * 100);
-	妖气变化(self, 0);
-	受伤(opponent, self, self->本次伤害);
+	妖气变化(self, -1);
+	受伤(opponent, self, self->本次伤害 );
 }
 
 
@@ -1127,10 +1339,14 @@ void 轮序到人物(Fight_info *self, Fight_info *opponent)
 		神通跟随(self, opponent, "普攻前");
 		神通跟随(opponent, self, "受击");
 		击晕判定及相关经过(self, opponent);
-			
+		暴击判定及相关经过(self, opponent);
+
 		if (self->已完成补气)
 			释放道法(self, opponent);
 		else 进行普攻(self, opponent);
+		神通跟随(self, opponent, "普攻后");
+		精怪跟随(self, opponent, "普攻后");
+	
 	}
 	else
 	{
@@ -1150,26 +1366,76 @@ void 轮序到人物(Fight_info *self, Fight_info *opponent)
 }
 
 
-void 轮序到灵兽(Fight_info *self, Fight_info *opponent, int 第几回合)
+void 灵兽效果(Fight_info *self, Fight_info *opponent, char *灵兽名称)
 {
-	if ((第几回合 + 1) % self->主灵兽出手频率 == 0)
+	if (!strcmp(灵兽名称, "青龙"))
 	{
+		if (self->灵兽图鉴->青龙_层数 < self->灵兽图鉴->青龙_满层)
+		{
+			计算实际暴击率(self, opponent);
+			printf("(灵兽效果：此前暴击率%g%%, ", self->暴击率);
+			战斗属性_setter(self,opponent,"暴击",self->战斗属性之暴击+self->灵兽图鉴->青龙_战斗属性之暴击加成);
+			self->灵兽图鉴->青龙_层数++;
+			printf("现暴击率%g%%)", self->暴击率);	
+		}
+	}
+	
+	// 玄武是强疗。当前版本计算器暂时不考虑强疗系数。
+}
+
+
+void 轮序到灵兽(Fight_info *self, Fight_info *opponent)
+{
+	if (self->第几回合 % self->主灵兽出手频率 == 0)
+	{
+		精怪跟随(self, opponent, "灵兽释放技能时");
+		神通跟随(self, opponent, "灵兽释放技能时");
+		
 		if (self->主灵兽回血倍率_乘在攻 != 0)
 		{
 			if (self->复活未起身) return;
 			计算本次治疗(self, opponent, "主灵兽回血");
-			printf("%s主灵兽%s回血%g%%\n", self->哪一方, self->主灵兽名称, self->本次治疗 * 100);
+			printf("%s主灵兽%s回血%g%%", self->哪一方, self->主灵兽名称, self->本次治疗 * 100);
 			治疗(self);
+			灵兽效果(self, opponent, self->主灵兽名称);
+			putchar(10);
 		}
 		else
 		{
 			if (opponent->复活未起身) return;
 			计算本次伤害(self, opponent, "主灵兽伤");	
-			printf("%s主灵兽%s%g%%\n", self->哪一方, self->主灵兽名称, self->本次伤害 * 100);
+			printf("%s主灵兽%s%g%%", self->哪一方, self->主灵兽名称, self->本次伤害 * 100);
 			受伤(opponent, self, self->本次伤害);
+			灵兽效果(self, opponent, self->主灵兽名称);
+			putchar(10);
 		}
+	}
+	
+	if (self->第几回合 % self->协同灵兽出手频率 == 0)
+	{
+		if (rand()%100+1 > self->协同灵兽出手概率*100) return;
+		
 		精怪跟随(self, opponent, "灵兽释放技能时");
 		神通跟随(self, opponent, "灵兽释放技能时");
+		
+		if (self->协同灵兽回血倍率_乘在攻 != 0)
+		{
+			if (self->复活未起身) return;
+			计算本次治疗(self, opponent, "协同灵兽回血");
+			printf("%s协同灵兽%s回血%g%%", self->哪一方, self->协同灵兽名称, self->本次治疗 * 100);
+			治疗(self);
+			灵兽效果(self, opponent, self->协同灵兽名称);
+			putchar(10);
+		}
+		else
+		{
+			if (opponent->复活未起身) return;
+			计算本次伤害(self, opponent, "协同灵兽伤");	
+			printf("%s协同灵兽%s%g%%", self->哪一方, self->协同灵兽名称, self->本次伤害 * 100);
+			受伤(opponent, self, self->本次伤害);
+			灵兽效果(self, opponent, self->协同灵兽名称);
+			putchar(10);
+		}
 	}
 }
 

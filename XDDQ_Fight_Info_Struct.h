@@ -5,8 +5,11 @@
 typedef struct 战斗信息 Fight_info;
 typedef struct 上次状态保存 Save;
 typedef struct 已触发次数记载 Trigger_count;
+typedef struct 精怪图鉴 Creature_handbook;
+typedef struct 灵兽图鉴 Beast_handbook;
 
 
+// Fight_info
 struct 战斗信息
 {
 	// 输出战斗信息
@@ -19,7 +22,7 @@ struct 战斗信息
 	float 协同灵兽伤, 协同灵兽回血;
 	char *哪一方;
 	short 可复活次数;
-	short 妖气;
+	float 妖气;
 	short 已完成补气;
 	float 增伤系数;
 	float 强灵系数;
@@ -29,6 +32,9 @@ struct 战斗信息
 	short 神通数量;
 	float 本次伤害, 本次治疗;
 	float 击晕率;
+	bool 触发了暴击;
+	float 暴伤系数;
+	float 暴击率;
 
 
 	// 精怪状态
@@ -52,13 +58,19 @@ struct 战斗信息
 	short 复活未起身;
 	short 被冰冻的需要失去几次行动;
 	bool 处于冰冻状态;
+	short 免疫冰冻燃烧回合数;
 	
+	// 回合状态
+	short 第几回合;
 	
 	// 存档
 	Save *存档;
 	
+	// 触发计数
+	Trigger_count *触发计数;
 	
-	// 输入战斗信息
+	
+	// 输入人物信息
 	float 道法伤倍率_乘在攻, 道法回血倍率_乘在攻;
 	char *道法名称;
 	float 主灵兽伤倍率_乘在攻, 主灵兽回血倍率_乘在攻;
@@ -66,6 +78,7 @@ struct 战斗信息
 	char *主灵兽名称;
 	float 协同灵兽伤倍率_乘在攻, 协同灵兽回血倍率_乘在攻;
 	short 协同灵兽出手频率;
+	float 协同灵兽出手概率;
 	char *协同灵兽名称;
 	char *携带神通;
 	char *携带精怪;
@@ -73,6 +86,19 @@ struct 战斗信息
 	float 识海钉掉血伤;
 	float 战斗属性之击晕, 战斗抗性之抗晕;
 	short 朱雀灵脉层数;
+	bool 百分百闪避;
+	short 勾陈灵脉层数;
+	float 战斗属性之暴击, 战斗抗性之抗暴;
+	float 无视战斗属性, 无视战斗抗性;
+	short 青龙灵脉层数;
+	
+	// 输入精怪图鉴
+	Creature_handbook *精怪图鉴;
+	
+	
+	// 输入灵兽图鉴
+	Beast_handbook *灵兽图鉴;
+	
 	
 	// 操控对局
 	short 漏晕几次;
@@ -82,18 +108,43 @@ struct 战斗信息
 };
 
 
-struct 已触发次数记载
-{
-	short 回春;
-	short 兽灵体;
-	short 大魔邪身;
-};
-
+// Save
 struct 上次状态保存
 {
 	short 被晕的需要失去几次行动;
 	short 复活未起身;
 	short 被冰冻的需要失去几次行动;
 	short 识海钉已触发;
-	Trigger_count *触发计数;
+};
+
+
+// Trigger_count
+struct 已触发次数记载
+{
+	short 回春;
+	short 兽灵体;
+	short 大魔邪身;
+	short 勾陈灵脉;
+	short 煌气;
+};
+
+
+// Creature_handbook
+struct 精怪图鉴
+{
+	// 皇帝
+	float 皇帝_攻倍;
+	
+	// 大明王
+	short 大明王_满层, 大明王_战斗属性之暴击加成;
+	short 大明王_层数;
+};
+
+
+// Beast_handbook
+struct 灵兽图鉴
+{
+	// 青龙
+	short 青龙_满层, 青龙_战斗属性之暴击加成;
+	short 青龙_层数;
 };
