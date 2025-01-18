@@ -3,8 +3,8 @@
 #include <time.h>
 #define DEBUG printf("---debug位置---\n行号:%d\n文件名:<%s>",__LINE__,__FILE__);getchar();
 #include <include/Fight_Info_Struct.h>
-#include <include/Fight_Info_Operate.h>
 #include <include/双方初始信息.h>
+#include <include/Fight_Info_Operate.h>
 
 // 击晕流的用法：通过更改敏捷度切换先手晕和后手晕，看后手晕有多险，万一被暴击呢？
 // 以及设置漏晕次数高达20次，从而达到全程漏晕，达到完全抗晕，等于无晕。用来收集无晕情况下的战况。
