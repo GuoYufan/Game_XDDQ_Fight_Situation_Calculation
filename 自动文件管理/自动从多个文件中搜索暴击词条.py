@@ -12,7 +12,7 @@ def browse_directory(prompt="❓where?"):
             for current_directory in os.listdir(os.getcwd()):print(current_directory)
         重新选择=False
         # 让用户输入去哪（以哪里作为工作目录）？（去上层目录或去下层目录或选定就在当前目录）
-        where=input(prompt+"(..:去上层|输入名称(可精确、可模糊)(模糊通配符*):去下层|Enter:就在这)\n")
+        where=input("\n"+prompt+"(..:去上层|输入名称(可精确、可模糊)(模糊通配符*):去下层|Enter:就在这)\n")
         # 如果输入..，表示去上层目录
         if where=="..":
             try:os.chdir(os.path.dirname(os.getcwd()))
@@ -42,7 +42,7 @@ def browse_directory(prompt="❓where?"):
             where=where.replace("*",".*")
             # 将匹配到的子目录收集进来
             subdirectorys=[re.search(where,name).group() for name in os.listdir(os.getcwd()) if re.fullmatch(where,name)]
-            input(subdirectorys)
+            #input(subdirectorys)
             if not subdirectorys:
                 print("❌没有这个名称的目录或文件\n")
                 重新选择=True
