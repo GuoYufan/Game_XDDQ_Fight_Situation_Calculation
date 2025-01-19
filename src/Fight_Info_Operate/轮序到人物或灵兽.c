@@ -69,7 +69,7 @@ void 解复活未起身(Fight_info *self, Fight_info *opponent)
 	{
 		self->复活未起身=0;
 		short 是碎心法复活的=(strstr(self->携带神通, "碎心法")!=NULL);
-		self->已损生命=(1 - (是碎心法复活的?self->碎心法回血:self->扶桑回血));
+		self->已损生命=(1 - (是碎心法复活的?self->神通图鉴->碎心法_回血量:self->神通图鉴->扶桑_回血量));
 		self->可复活次数--;
 		
 		printf("⚡️️(目前:先手方%g%% VS 后手方%g%%)\n", 后手方->已损生命*100,
