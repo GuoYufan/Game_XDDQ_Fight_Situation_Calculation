@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "../../include/Fight_Info_Struct.h"
 #include "../../include/Fight_Info_Operate.h"
-#include "../../../../Common/GYF/include/GYF.h"
+#include "Common/GYF/include/GYF.h"
 
 void 计算实际击晕率(Fight_info *self, Fight_info *opponent)
 {
