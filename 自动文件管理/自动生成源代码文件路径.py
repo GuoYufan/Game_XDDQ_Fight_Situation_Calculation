@@ -7,7 +7,7 @@ def 自动生成源代码文件相对路径():
     project_path = os.getcwd()
 
     while True:
-        browse_directory("❓下一批其他源文件所在目录在哪？",os.getcwd())
+        browse_directory("❓下一批其他源文件所在目录在哪？",project_path)
         src_path = os.getcwd()
         # src_dir = re.search(re.escape(project_path)+os.sep+"(.+)",src_path).group(1)
         # src_dir = src_path.replace(project_path+os.sep,"")
