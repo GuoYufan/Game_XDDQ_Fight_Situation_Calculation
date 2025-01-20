@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../Common/GYF/include/GYF.h"
+#include "Common/GYF/include/GYF.h"
 #include "../../include/Fight_Info_Struct.h"
 #include "../../include/双方初始信息.h"
 
@@ -785,4 +785,4 @@ void 将人物能力置为默认值(Fight_info *self, float 对手倍数)
 
 
 
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"atible-pointer-types"-pointer-types"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
