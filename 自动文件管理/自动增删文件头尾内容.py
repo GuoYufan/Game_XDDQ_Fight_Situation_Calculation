@@ -1,6 +1,6 @@
 import os,sys
 
-from 自动从多个文件中搜索暴击词条 import browse_directory
+from 切换工作目录 import browse_directory
 
 def 危险操作之前询问(prompt):
     answer=input(prompt)
@@ -63,7 +63,7 @@ particulars.append(dict())
 particulars[1]["files"]=["战斗属性的触发概率计算与判定及相关经过.c"]
 particulars[1]["第几行之前"]=5
 particulars[1]["header_content"]=header_content+\
-'''#include "../../../../Common/GYF/include/GYF.h"
+'''#include "Common/GYF/include/GYF.h"
 '''
     
 # 开关之是否仅特殊组参与
@@ -99,4 +99,4 @@ def main():
 if __name__=="__main__":main()
 
 # updated:2025.1.18
-# 《自动增删文件头内容》v1.0.0-beta.1
+# 《自动增删文件头内容》v1.0.0-beta

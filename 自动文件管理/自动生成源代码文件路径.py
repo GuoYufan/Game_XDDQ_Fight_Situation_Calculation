@@ -1,13 +1,13 @@
 import os,re
 
-from 自动从多个文件中搜索暴击词条 import browse_directory
+from 切换工作目录 import browse_directory
 
 def 自动生成源代码文件相对路径():
     browse_directory("❓main源文件所在目录在哪？")
     main_path = os.getcwd()
 
     while True:
-        browse_directory("❓下一批其他源文件所在目录在哪？")
+        browse_directory("❓下一批其他源文件所在目录在哪？",os.getcwd())
         src_path = os.getcwd()
         # src_dir = re.search(re.escape(main_path)+os.sep+"(.+)",src_path).group(1)
         # src_dir = src_path.replace(main_path+os.sep,"")
@@ -17,7 +17,7 @@ def 自动生成源代码文件相对路径():
 
         src_files = [f for f in os.listdir() if os.path.isfile(os.sep.join((src_path,f))) and f.endswith('.c')]
         browse_directory("❓将生成的含有源代码文件相对路径的txt文件保存在哪？")
-        if not input("❓确定开始生成或续写该txt文件?(Enter:否并退出)"):
+        if not input("❓确定开始生成或续写该txt文件?(Enter:否并退出)\n"):
             break
         with open('源代码文件相对路径.txt', 'a') as f:
             for src in src_files:
