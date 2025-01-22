@@ -19,11 +19,13 @@ def 自动判断文件是否相对于给定日期更新(after_that_time="2025-01
             continue
         break
     print("⚡️你的决定：给定日期是:",after_that_time_formated,end="\n"*2)
+    after_that_time=str(after_that_time_formated)
+    content=f"⚡️给定日期：{after_that_time_formated}（将修改日期与之对比是否在这之后，从而获知哪些文件是更新了的，从而避免漏把更新了的文件及时上传）\n"
+   
     if input("❓是否仅展示更新的文件？\n(Enter:否(默认)|Y/y:是)\n").lower()=="y":
         new_only=True
     print("⚡️你的决定：仅展示更新的文件:", "是" if new_only else "否",end="\n"*2)
-    content=""
-    
+        
     roots_size=0
     for root,dirs,files in os.walk(os.getcwd()):       
         root_size=0
@@ -59,11 +61,14 @@ def 自动判断文件是否相对于给定日期更新(after_that_time="2025-01
         f.write(content)
             
     print(f"✅所有文件的修改时间及大小已保存完毕！")
+    
+    return after_that_time
 
 def main():
     os.chdir(os.path.dirname(__file__))
+    default_setting_after_that_time="2025-01-19 10:30:14"
     while True:
-        自动判断文件是否相对于给定日期更新("2025-01-19 10:30:14")
+        default_setting_after_that_time=自动判断文件是否相对于给定日期更新(default_setting_after_that_time)
         input("按任意键继续...\n")
 
 if __name__=="__main__":main()
