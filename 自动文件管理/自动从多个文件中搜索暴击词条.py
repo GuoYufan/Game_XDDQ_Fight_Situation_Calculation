@@ -5,7 +5,7 @@ from 选择多个文件 import select_multiple_files
 
 # --- 文 本 搜 索 器 （从多个文件搜索指定文本） ---
 def search_in_files():
-    browse_directory("❓从哪个目录的多个文件中搜索指定文本？")
+    browse_directory("❓从哪个目录的多个文件中搜索指定文本？",os.getcwd())
     
     # 工作目录下的所有文件名
     src_files = [f for f in os.listdir(os.getcwd()) if os.path.isfile(os.path.relpath(f))]
@@ -49,6 +49,7 @@ def search_in_files():
 
             
 if __name__=="__main__":
+    os.chdir(os.path.dirname(__file__))
     while True:
         search_in_files()
         input("按任意键继续...\n")
@@ -66,3 +67,6 @@ if __name__=="__main__":
 
 # fixed:2025.1.20 11:27
 # 《自动从多个文件中搜索“暴击”文本》v1.0.1
+
+# updated:2025.1.22 17:11
+# 优化了搜索完一遍之后，使得不会重置到本文件所在目录，而是能够停留在最近的工作目录，从而不像之前那么不方便
