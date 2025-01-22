@@ -1,11 +1,16 @@
+⚡️给定日期：2025-01-22 19:39:00（将修改日期与之对比是否在这之后，从而获知哪些文件是更新了的，从而避免漏把更新了的文件及时上传）
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览
 modify_time.txt
-修改时间:2025-01-22 18:16:00.256002(更新了)
-文件大小: 5334 字节
+修改时间:2025-01-22 21:07:34.436002(更新了)
+文件大小: 5519 字节
 
-目录大小: 37338 字节
+modify_time_new_only.txt
+修改时间:2025-01-22 19:58:50.204002(更新了)
+文件大小: 2171 字节
+
+目录大小: 18545 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/Common
@@ -17,15 +22,15 @@ modify_time.txt
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/Common/GYF/include
-目录大小: 5334 字节
+目录大小: 2171 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/Common/GYF/src
-目录大小: 5334 字节
+目录大小: 2171 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/include
-目录大小: 16002 字节
+目录大小: 6513 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/src
@@ -33,26 +38,22 @@ modify_time.txt
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/src/Fight_Info_Operate
-目录大小: 101346 字节
+目录大小: 41249 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/src/双方初始信息
-目录大小: 5334 字节
+目录大小: 2171 字节
 
 ⚡️--- Next Root ---
 /storage/emulated/0/[GuoYufan]/Code/寻道大千/Major/Project1_战况预览/自动文件管理
 .last_tmp.py
-修改时间:2025-01-22 18:15:49.108002(更新了)
-文件大小: 4222 字节
+修改时间:2025-01-22 21:07:04.996002(更新了)
+文件大小: 4987 字节
 
 自动判断文件是否相对于给定日期更新.py
-修改时间:2025-01-22 18:15:48.588002(更新了)
-文件大小: 4223 字节
+修改时间:2025-01-22 19:58:59.224002(更新了)
+文件大小: 4988 字节
 
-自动从多个文件中搜索暴击词条.py
-修改时间:2025-01-22 17:52:54.348001(更新了)
-文件大小: 3568 字节
+目录大小: 49879 字节
 
-目录大小: 36989 字节
-
-全部内容总大小: 207677 字节
+全部内容总大小: 122699 字节
