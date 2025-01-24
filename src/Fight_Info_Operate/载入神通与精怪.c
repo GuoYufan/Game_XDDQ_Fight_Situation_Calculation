@@ -57,4 +57,11 @@ void 载入神通与精怪(Fight_info * self, Fight_info * opponent)
 		opponent->增伤系数-=0.1;
 	}
 	
+	if (strstr(self->携带精怪, "香夫人") != NULL )
+	{
+		self->攻*=1.07;
+	}
+	
+	
+	
 }

@@ -163,8 +163,8 @@ void 轮序到人物(Fight_info *self, Fight_info *opponent)
 	
 	if (!opponent->复活未起身 && !(self->处于冰冻状态 || self->处于被晕状态))
 	{
-		精怪跟随(self, opponent, "普攻前");
 		神通跟随(self, opponent, "普攻前");
+		精怪跟随(self, opponent, "普攻前");
 		神通跟随(opponent, self, "受击");
 		击晕判定及相关经过(self, opponent);
 		暴击判定及相关经过(self, opponent);
@@ -216,9 +216,9 @@ void 轮序到灵兽(Fight_info *self, Fight_info *opponent)
 {
 	if (self->第几回合 % self->主灵兽出手频率 == 0)
 	{
-		精怪跟随(self, opponent, "灵兽释放技能时");
 		神通跟随(self, opponent, "灵兽释放技能时");
-		
+		精怪跟随(self, opponent, "灵兽释放技能时");
+
 		if (self->主灵兽回血倍率_乘在攻 != 0)
 		{
 			if (self->复活未起身) return;
@@ -242,10 +242,11 @@ void 轮序到灵兽(Fight_info *self, Fight_info *opponent)
 	if (self->第几回合 % self->协同灵兽出手频率 == 0)
 	{
 		if (rand()%100+1 > self->协同灵兽出手概率*100) return;
+		self->统计本场_协同灵兽出手++;
 		
-		精怪跟随(self, opponent, "灵兽释放技能时");
 		神通跟随(self, opponent, "灵兽释放技能时");
-		
+		精怪跟随(self, opponent, "灵兽释放技能时");
+
 		if (self->协同灵兽回血倍率_乘在攻 != 0)
 		{
 			if (self->复活未起身) return;

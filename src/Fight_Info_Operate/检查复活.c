@@ -1,7 +1,10 @@
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../include/Fight_Info_Struct.h"
 #include "../../include/Fight_Info_Operate.h"
+
+extern jmp_buf j;
 
 void 检查复活(Fight_info * self, Fight_info * opponent)
 {
@@ -23,21 +26,25 @@ void 检查复活(Fight_info * self, Fight_info * opponent)
 		if (!self->复活未起身 && self->可复活次数<1)
 		{
 			printf("(%s方已死，无复活)\n", self->哪一方);
-			printf("\n📖\n(%s方告负)\n", self->哪一方);
+			printf("\n📖\n(%s方(%s)告负)\n", self->哪一方, self->who);
 			
 			
 			//统一free(self,opponent);
-			exit(EXIT_SUCCESS);
+			//exit(EXIT_SUCCESS);
+			opponent->获胜次数++;
+			longjmp(j, 1);
 		}
 		else if (self->处于冰冻状态)
 		{
 			if (strstr(self->携带神通, "碎心法") == NULL)
 			{
 				printf("(%s方已死，扶桑被冰冻不能复活)\n", self->哪一方);
-				printf("\n📖\n(%s方告负)\n", self->哪一方);
+				printf("\n📖\n(%s方(%s)告负)\n", self->哪一方, self->who);
 				
 				//统一free(self,opponent);
-				exit(EXIT_SUCCESS);
+				//exit(EXIT_SUCCESS);
+				opponent->获胜次数++;
+				longjmp(j, 1);
 			}
 		}
 				
