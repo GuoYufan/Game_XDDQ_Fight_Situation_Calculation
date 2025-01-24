@@ -7,6 +7,8 @@
 #include "../../include/Fight_Info_Struct.h"
 #include "../../include/双方初始信息.h"
 
+extern short 第几场;
+
 void Fight_info_show(Fight_info * self)
 {
 	printf("攻:%g 血:%g 防:%g 敏:%g\n", self->攻, self->血, self->防, self->敏);
@@ -56,9 +58,12 @@ void Fight_info_init(Fight_info * self, char *who)
 	
 	// 当前对手_97亿越战140亿(self,who);
 	
-	当前对手_回归斗法打1点6倍对手(self,who);
+	// 当前对手_反暴号_回归斗法打1点6倍对手(self,who);
 	
 	// 当前对手_新区炼气之前(self,who);
+	
+	当前对手_击晕号_六道(self,who);
+	
 
 
 }
@@ -87,6 +92,91 @@ void Fight_info_init(Fight_info * self, char *who)
 */
 
 
+void 当前对手_击晕号_六道(Fight_info *self, char *who)
+{
+	双方初始信息的开头统一部分以及先行初始化(self);
+	
+	Creature_handbook_init(self,who);
+	Beast_handbook_init(self,who);
+	Avator_handbook_init(self,who);
+	
+	if (!strcmp(who, "敌"))
+	{
+		self->攻=84;
+		self->血=584;
+		self->剩余生命=self->血;
+		self->防=16.8;
+		self->敏=4510;
+		self->道法伤倍率_乘在攻=0;
+		self->道法回血倍率_乘在攻=0;
+		self->道法名称="";
+		self->主灵兽伤倍率_乘在攻=0.4;
+		self->主灵兽出手频率=1;
+		self->主灵兽名称="蜂翁";
+		self->协同灵兽伤倍率_乘在攻=0;
+		self->协同灵兽回血倍率_乘在攻=0;
+		self->协同灵兽出手频率=0;
+		self->协同灵兽出手概率=0;
+		self->协同灵兽名称="";
+		self->携带神通="长生体";
+		self->神通图鉴->扶桑_回血量=0.12;
+		//self->神通图鉴->识海钉=0.028;
+		self->增伤系数=(100 + 10 - 13.5) / 100.0;
+		self->强灵系数=(100 + 0 - 6.3) / 100.0;
+		self->强疗系数=(100 + 0 - 2.5) / 100.0;
+		self->携带精怪="干饭人,香夫人";
+		self->无视战斗属性=0;
+		self->战斗抗性之抗晕=171;
+		self->战斗属性之击晕=133;
+		self->漏晕几次=0;
+		self->自行设置额外伤=0;
+		self->额外伤限定回合数=0;
+		self->战斗属性之暴击=44;
+		self->战斗抗性之抗暴=69;
+	}
+	else
+	{
+		self->攻=28.68;
+		self->血=278.37;
+		self->已损生命=0;
+		self->剩余生命=self->血;
+		self->防=4.8117;
+		// 故意弄到后手方
+		self->敏=4652;
+		self->道法伤倍率_乘在攻=1.26;
+		self->道法名称="三味火";
+		self->主灵兽伤倍率_乘在攻=5;
+		self->主灵兽回血倍率_乘在攻=0;
+		self->主灵兽出手频率=5;
+		self->主灵兽名称="应龙";
+		self->协同灵兽伤倍率_乘在攻=0;
+		self->协同灵兽回血倍率_乘在攻=1.11;
+		self->协同灵兽出手频率=2;
+		self->协同灵兽出手概率=0.2;
+		self->协同灵兽名称="鸾鸟";
+		self->携带神通="三味火,识海钉,碎心法,化羽";
+		self->神通图鉴->碎心法_回血量=0.12;
+		self->增伤系数=(100 + 6.8 - 10) / 100.0;
+		self->强灵系数=(100 + 4.3 - 0) / 100.0;
+		self->强疗系数=(100 + 2.2 - 0) / 100.0;
+		self->携带精怪="小龙女,山泽精,大树妖";
+		self->无视战斗属性=8.8;
+		self->无视战斗抗性=6.3;
+		self->战斗抗性之抗晕=113;
+		self->战斗属性之击晕=212;
+		self->朱雀灵脉层数=4;
+		// 设置大于已知回合数可无晕
+		self->漏晕几次=0;
+		self->自行设置额外伤=0;
+		self->额外伤限定回合数=0;
+		self->战斗属性之暴击=42;
+		self->战斗抗性之抗暴=76;
+
+	}
+	
+	双方初始信息的结尾统一部分(self);
+}
+
 void 当前对手_新区炼气之前(Fight_info *self, char *who)
 {
 	双方初始信息的开头统一部分以及先行初始化(self);
@@ -112,7 +202,7 @@ void 当前对手_新区炼气之前(Fight_info *self, char *who)
 
 }
 
-void 当前对手_回归斗法打1点6倍对手(Fight_info *self, char *who)
+void 当前对手_反暴号_回归斗法打1点6倍对手(Fight_info *self, char *who)
 {
 	双方初始信息的开头统一部分以及先行初始化(self);
 	
@@ -584,6 +674,10 @@ void Creature_handbook_common(Fight_info *self)
 	self->精怪图鉴->大树妖_满层=5;
 	self->精怪图鉴->大树妖_层数=0;
 	self->精怪图鉴->大树妖_强灵加成=0.07;
+	
+	self->精怪图鉴->干饭人_治疗=0.1;
+	
+	
 }
 
 // 精怪图鉴初始化
@@ -675,6 +769,14 @@ void Avator_handbook_init(Fight_info *self, char *who)
 
 void 双方初始信息的开头统一部分以及先行初始化(Fight_info *self)
 {
+	if (第几场<2)
+	{
+		self->精怪分组=NULL;
+		self->神通分组=NULL;
+	}
+	
+	self->统计本场_协同灵兽出手=0;
+		
 	// 开头统一
 	self->携带精怪=self->携带神通="";
 	self->已损生命=self->被晕的需要失去几次行动=0;
@@ -719,8 +821,11 @@ void 双方初始信息的开头统一部分以及先行初始化(Fight_info *se
 
 void 双方初始信息的结尾统一部分(Fight_info *self)
 {
-	self->精怪分组=GYF_strsplit(self->携带精怪, &self->精怪数量);
-	self->神通分组=GYF_strsplit(self->携带神通, &self->神通数量);
+	if (第几场<2)
+	{
+		self->精怪分组=GYF_strsplit(self->携带精怪, &self->精怪数量);
+		self->神通分组=GYF_strsplit(self->携带神通, &self->神通数量);
+	}
 
 	self->战斗属性之击晕+=self->无视战斗抗性;
 	self->战斗抗性之抗晕+=self->无视战斗属性;
@@ -746,12 +851,43 @@ void 应龙流(Fight_info *self, float 倍率)
 }
 
 
-void 鸾鸟流(Fight_info *self, float 倍率)
+void 鸾鸟流(Fight_info *self, float 倍率, short mode)
 {
+	if (mode!=-1)
+	{
 	self->主灵兽伤倍率_乘在攻=0;
 	self->主灵兽回血倍率_乘在攻=倍率;
 	self->主灵兽出手频率=2;
-	self->主灵兽名称="鸾鸟";		
+	self->主灵兽名称="鸾鸟";
+	}
+	
+	if (mode!=1)
+	{
+		self->协同灵兽伤倍率_乘在攻=0;
+		self->协同灵兽回血倍率_乘在攻=倍率;
+		self->协同灵兽出手频率=2;
+		self->协同灵兽名称="鸾鸟";
+	}		
+}
+
+void 蜂翁流(Fight_info *self, float 倍率, short mode)
+{
+	// 1：主 0：主协 -1：协
+	if (mode!=-1)
+	{
+	self->主灵兽伤倍率_乘在攻=倍率;
+	self->主灵兽回血倍率_乘在攻=0;
+	self->主灵兽出手频率=1;
+	self->主灵兽名称="蜂翁";
+	}
+	
+	if (mode!=1)
+	{
+		self->协同灵兽伤倍率_乘在攻=倍率;
+		self->协同灵兽回血倍率_乘在攻=0;
+		self->协同灵兽出手频率=1;
+		self->协同灵兽名称="蜂翁";
+	}		
 }
 
 
