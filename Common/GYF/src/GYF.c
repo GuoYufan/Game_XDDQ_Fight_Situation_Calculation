@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#define DEBUG printf("---debug位置---\n行号:%d\n文件名:<%s>",__LINE__,__FILE__);getchar();
 
+//extern short 第几场;
 
 // ignore=真值 : 忽略输入异常
 // ignore=假值(默认) : 不忽略输入异常
@@ -43,6 +45,9 @@ short in_interval(float number, float begin, float end)
 
 char **GYF_strsplit(char *input_str, int *number)
 {
+	// 防止第二次进入该函数不从storage[0]开始存，而是从上一次的[*number]开始存。造成[0]是只开辟了地址没有存值的，是(null)的。
+	*number=0;
+	
 	// printf("输入字符串内容：%s 存放输入字符串的地址：%p",input_str,input_str);getchar();
 	// printf("存放元素数量的地址及内容：%p %d\n",number,*number);
 	char **storage = malloc(0);
@@ -64,12 +69,13 @@ char **GYF_strsplit(char *input_str, int *number)
 		// 计算子字符串的长度
 		int len = current_end - current_start;
 		//printf("len:%d\n",len);getchar();
-
+		
 		// 分配足够的空间来存储子字符串
 		storage[*number] = malloc(len + 1);
 		strncpy(storage[*number], current_start, len);
 		storage[*number][len] = '\0';	// 手动添加字符串结尾
 		
+
 		//puts(storage[*number]);
 		//getchar();
 		// 打印每个分割出的字符串
@@ -77,12 +83,21 @@ char **GYF_strsplit(char *input_str, int *number)
 
 		// 更新索引和指针位置
 		(*number)++;
+		
 		//printf("number:%d",*number);getchar();
 		//printf("%p %d\n",number,*number);
 		current_start = current_end + 1;
 		//printf("%c %d",*(current_start-1),*(current_start-1)=='\0');getchar();
 		if (*(current_start-1)=='\0') break;
 	}
+	
+	/*
+	if (第几场>1){
+		printf("number:%d\n",*number);
+		printf("storage[%d]:%s\n",*number-1,storage[*number-1]);
+		printf("storage[0]:%s\n",storage[0]);
+		DEBUG}
+	*/
 
 	//printf("%p\n",storage);
 	return storage;
