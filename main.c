@@ -1,3 +1,4 @@
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,6 +6,14 @@
 #include <include/Fight_Info_Struct.h>
 #include <include/双方初始信息.h>
 #include <include/Fight_Info_Operate.h>
+#include <Common/GYF/include/GYF.h>
+
+jmp_buf j;
+short 第几场 = 0;
+Fight_info *双方[2];
+
+/* 
+   enum{ CONTINUE, EXIT }ReturnValue; */
 
 // 击晕流的用法：通过更改敏捷度切换先手晕和后手晕，看后手晕有多险，万一被暴击呢？
 // 以及设置漏晕次数高达20次，从而达到全程漏晕，达到完全抗晕，等于无晕。用来收集无晕情况下的战况。
@@ -16,41 +25,28 @@
 
 // 支持暴击和暴伤系数和青龙灵脉。
 
-/*
+/* 
    v1.0.1版本概要：
    从尝试解决上一版本的遗留问题——蚀魂咒问题——入手。
    成功模拟了一场打1.6倍有必复活（扶桑+煌气免疫冰冻所以必然复活）有治疗（煌气）有锁血（金刚不坏）的对手，战况准度极高。
-   并且在这场通过使赌可赌的运气强制为不需要赌快速（不需要运行那么多次）复现了与实战中完全相同的100%胜率方法。
-   */
+   并且在这场通过使赌可赌的运气强制为不需要赌快速（不需要运行那么多次）复现了与实战中完全相同的100%胜率方法。 */
 
 // 支持协同灵兽行动。
 
-short main()
-{
-	srand(time(NULL));
-	// printf("%d\n",sizeof (Fight_info)); getchar();
-	
-	Fight_info *我=(Fight_info *) malloc(sizeof(Fight_info));
-	Fight_info *敌=(Fight_info *) malloc(sizeof(Fight_info));
-	
-	if (我==NULL || 敌==NULL)
-	{
-		fprintf(stderr,"❌内存分配失败!");
-		exit(EXIT_FAILURE);
-	}
-
+void 本场战斗之战况预览(Fight_info * 我, Fight_info * 敌)
+{	
 	// 初始化双方战斗信息
 	Fight_info_init(我, "我");
 	Fight_info_init(敌, "敌");
-	
+
 	// 载入神通与精怪
 	载入神通与精怪(我, 敌);
 	载入神通与精怪(敌, 我);
-	
+
 	// 显示战斗中的攻血防敏
 	Fight_info_show(我);
 	Fight_info_show(敌);
-	
+
 
 	// 分出先后手方
 	Fight_info *先手方=NULL, *后手方=NULL;
@@ -61,7 +57,6 @@ short main()
 
 	// 不受影响的计算与显示
 	不受影响的计算与显示(先手方, 后手方);
-	
 
 	// 进入战斗
 	puts("\n📝\n---《进入战斗》---");
@@ -70,40 +65,49 @@ short main()
 	{
 		printf("第%d回合\n", i + 1);
 		printf("~~~~~~~\n");
-		
-		///*强制使可赌的这部分运气不需要赌
-		if (i+1==1)
+
+		// /*强制使可赌的这部分运气不需要赌
+		if (i + 1 == 1)
 		{
+			我->血=289.5;
+			我->攻=29.9;
+			我->防=5.3;
+			//蜂翁流(我, 0.4, -1);
+			鸾鸟流(我, 1.11, -1);
+			我->除了设置漏晕以外的皆必晕=true;
+			我->漏晕几次=1;
+			敌->漏晕几次=16;
+			我->协同灵兽出手概率=0.2;
 			// 赌对手协同灵兽玄武不行动
 			敌->协同灵兽出手概率=0;
-			
+
 			// 协同灵兽青龙补伤害（赌协同灵兽出手一次即可）
 			// 我->协同灵兽出手概率=0;
 			// 敌->已损生命+=0.0374252*1;
-			
+
 			// 稳暴击（赌暴击一次不落）
 			// 我->战斗属性之暴击+=(100-(我->战斗属性之暴击-敌->战斗抗性之抗暴));
 		}
-		///*
-		
-		先手方->第几回合=后手方->第几回合=i+1;
-		
+		// /*
+
+		先手方->第几回合=后手方->第几回合=i + 1;
+
 		// 灵脉
 		灵脉跟随(先手方, "回合开始时");
 		灵脉跟随(后手方, "回合开始时");
-		
-		//Segmentation fault
-		//getchar();
+
+		// Segmentation fault
+		// getchar();
 		// 精怪
 		精怪跟随(先手方, 后手方, "回合开始时");
 		精怪跟随(后手方, 先手方, "回合开始时");
-		
-		
+
+
 		// 神通
 		神通跟随(先手方, 后手方, "回合开始时");
 		神通跟随(后手方, 先手方, "回合开始时");
-		
-		//getchar();
+
+		// getchar();
 		// 灵兽
 		轮序到灵兽(先手方, 后手方);
 		精怪跟随(先手方, 后手方, "");
@@ -117,23 +121,109 @@ short main()
 		// 被晕状态
 		检查人物受控状态是否可恢复(先手方);
 		检查人物受控状态是否可恢复(后手方);
-		
-				
+
+
 		// 人物
 		轮序到人物(先手方, 后手方);
 		轮序到人物(后手方, 先手方);
-		
-	
+
+
 		// 回合结束时（对一些效果回合数进行回退）
 		神通跟随(先手方, 后手方, "回合结束时");
 		神通跟随(后手方, 先手方, "回合结束时");
-		
+
 		// 实时战况反馈
 		printf("(目前:先手方%g%% VS 后手方%g%%)\n", 后手方->已损生命*100,
 			   先手方->已损生命*100);
 		printf("(目前妖气:先手方%g VS 后手方 %g)\n", 先手方->妖气,
 			   后手方->妖气);
 		putchar(10);
+	}
+
+}
+
+void 记者召开发布会(Fight_info *双方[],short 这几场)
+{
+	printf("\n📖\n针对这%d场记者召开发布会\n", 这几场);
+	for (short i = 0; i < 2; i++)
+	{
+		printf("%s参赛%d场,", 双方[i]->who, *(双方[i]->参赛次数));
+		printf("获胜次数%d,", 双方[i]->获胜次数);
+		printf("胜率%.2f%%\n", (float )(双方[i]->获胜次数)/  (float)(*(双方[i]->参赛次数)) * 100.0);
+		printf("本场协同灵兽出手%d次\n", 双方[i]->统计本场_协同灵兽出手);
+	}
+}
+
+void 进行一场(Fight_info *我, Fight_info *敌)
+{
+	switch (setjmp(j))
+	{
+	case 0:
+		第几场++;
+		本场战斗之战况预览(我, 敌);
+		printf("this line\n");
+	case 1:
+		printf("\n📖\n第%d场已结束\n",第几场);
+		break;
+	default:
+		break;
+	}
+}
+
+void 第一场(Fight_info *我, Fight_info *敌)
+{	
+	进行一场(我, 敌);
+	记者召开发布会(双方, 1);
+}
+
+void 再来多少场(Fight_info *我, Fight_info *敌)
+{
+	short 场次;
+	printf("\n❓再来多少场?\n⚡️答:");
+	scanf("%d",&场次);
+	
+	for (short i=0; i<场次; i++)
+	{
+		进行一场(我, 敌);
+	}
+	
+	记者召开发布会(双方, 场次);
+}
+short main()
+{
+	srand(time(NULL));
+	// printf("%d\n",sizeof (Fight_info)); getchar();
+
+	Fight_info *我=(Fight_info *) malloc(sizeof(Fight_info));
+	Fight_info *敌=(Fight_info *) malloc(sizeof(Fight_info));
+		
+	if (我==NULL || 敌==NULL)
+	{
+		fprintf(stderr, "❌内存分配失败!");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	双方[0] = 我;
+	双方[1] = 敌;
+	我->who = "我";
+	敌->who = "敌";	
+	我->参赛次数=&第几场;
+	敌->参赛次数=我->参赛次数;
+	
+	
+	第一场(我, 敌);
+	char *press=malloc(0);
+	while ( true )
+	{
+		再来多少场(我, 敌);
+		printf("#Q/q to quit:");
+		scanf("%s",press);
+		strlower(press);
+		if (!strcmp(press,"q"))
+		{
+			return 0;
+		}
 	}
 	
 	return 0;
@@ -155,3 +245,24 @@ short main()
    ​[先手方霸王2.82%]
 
  */
+ 
+/* updated: 2025.1.24 16:31
+终于知道Segmentation fault的问题是因为什么。
+在自动战斗多场时，就知道第一场可能不一定Segmentation fault。
+第二场必定Segmentation fault，必定是没法看的。
+造成根本没法一次运行打多于一场。
+原因在于GYF_strsplit()里没有把*number重置为0。
+造成第二场进入这函数进行storage[*number]时是往上次的最后一个索引+1（也就是数量）去装。
+而没有从[0]开始。
+而新的一场又是从[0]开始的，都是i=0开始。
+造成从[0]取到的字符串是(null)。
+*/
+
+/*
+updated： 2025.1.24 17:42
+从最开始是一次运行只能看多场
+到刚才是一次运行能看多场但只能一场一场地看，而且看不超过10场就看不了了
+到现在很稳定，可以不用一场一场地看很多场了
+因为我用在其他文件extern全局变量<short 第几场>去限制char**只被赋值一次
+通过避免init的对char**初始化的大于1次执行
+*/
