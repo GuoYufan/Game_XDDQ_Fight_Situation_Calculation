@@ -36,6 +36,7 @@ struct 战斗信息
 	bool 触发了暴击;
 	float 暴伤系数;
 	float 暴击率;
+	float 强疗系数;
 
 
 	// 精怪状态
@@ -45,6 +46,7 @@ struct 战斗信息
 	short 雷公层数;
 	short 精怪被冰冻;
 	short 皇帝已触发;
+	bool 虞美人已触发;
 	
 	// 神通状态
 	bool 金刚不坏已触发;
@@ -68,6 +70,12 @@ struct 战斗信息
 	// 触发计数
 	Trigger_count *触发计数;
 	
+	
+	// 结果统计
+	short *参赛次数;
+	short 获胜次数;
+	char *who;
+	short 统计本场_协同灵兽出手;
 	
 	// --- 输 入 ---
 	
@@ -148,6 +156,8 @@ struct 精怪图鉴
 	
 	short 大树妖_满层, 大树妖_层数;
 	float 大树妖_强灵加成;
+	
+	float 干饭人_治疗;
 };
 
 

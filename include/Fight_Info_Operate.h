@@ -1,3 +1,4 @@
+void 本场战斗之战况预览();
 // void 统一free(Fight_info *, Fight_info *);
 
 // --- 受 伤 与 治 疗 ---
